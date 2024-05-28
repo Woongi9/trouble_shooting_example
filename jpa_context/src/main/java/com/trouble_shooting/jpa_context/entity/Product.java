@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "ORDER")
-public class Order extends ParentEntity{
+@Table(name = "PRODUCT")
+public class Product extends ParentEntity{
 
 	@Column(name = "name")
 	private String name;
@@ -20,7 +20,7 @@ public class Order extends ParentEntity{
 	private int price;
 
 	@Builder
-	public Order(String name, int price) {
+	public Product(String name, int price) {
 		this.name = name;
 		this.price = price;
 	}
