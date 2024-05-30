@@ -18,7 +18,7 @@ public class PersistenceContextTest {
 	@Test
 	@Transactional
 	@DisplayName("PrePersist 어노테이션 1차 캐시 진입 or 플러시에서 동작 위치 확인")
-	void prePersist() {
+	void prePersist() throws InterruptedException {
 		Product product = Product.builder()
 			.name("주문")
 			.price(1000)
@@ -26,10 +26,12 @@ public class PersistenceContextTest {
 		entityManager.persist(product);
 
 		Product persistedProduct = entityManager.find(Product.class, product.getId());
-		System.out.println("order.getCreateDateTime() = " + persistedProduct.getCreateDateTime());
+		System.out.println("persistedProduct.getCreateDateTime() = " + persistedProduct.getCreateDateTime());
+
+		Thread.sleep(5000);
 
 		entityManager.flush();
 		Product flushedProduct = entityManager.find(Product.class, product.getId());
-		System.out.println("order.getCreateDateTime() = " + flushedProduct.getCreateDateTime());
+		System.out.println("flushedProduct.getCreateDateTime() = " + flushedProduct.getCreateDateTime());
 	}
 }
