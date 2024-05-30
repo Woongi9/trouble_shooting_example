@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface ProductService {
 
-	void purchaseOrder(List<ProductServiceImpl.PurchaseOrderDTO> purchaseOrderDTO);
+	void purchaseOrder(List<ProductServiceImpl.PurchaseProductDTO> purchaseProductDTO);
 }

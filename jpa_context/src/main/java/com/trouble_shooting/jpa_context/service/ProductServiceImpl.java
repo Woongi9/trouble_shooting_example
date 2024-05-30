@@ -1,5 +1,7 @@
 package com.trouble_shooting.jpa_context.service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -30,41 +32,49 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	@Transactional
-	public void purchaseOrder(List<PurchaseOrderDTO> purchaseOrderDTOList) {
-		for (PurchaseOrderDTO purchaseOrderDTO : purchaseOrderDTOList) {
-			Product product = productRepository.findById(purchaseOrderDTO.getOrderId()).orElseThrow(() ->
-				new IllegalArgumentException("해당 아이디의 Order가 없습니다. orderId=" + purchaseOrderDTO.getOrderId()));
-			User user = userRepository.findById(purchaseOrderDTO.getUserId()).orElseThrow(() ->
-				new IllegalArgumentException("해당 아이디의 User가 없습니다. userId=" + purchaseOrderDTO.getUserId()));
+	public void purchaseOrder(List<PurchaseProductDTO> purchaseProductDTOList) {
+		Date nowDate = new Date();
+		List<ProductPurchase> productPurchaseList = new ArrayList<>();
+		List<ProductHistory> productHistoryList = new ArrayList<>();
+		for (PurchaseProductDTO purchaseProductDTO : purchaseProductDTOList) {
+			Product product = productRepository.findById(purchaseProductDTO.getOrderId()).orElseThrow(() ->
+				new IllegalArgumentException("해당 아이디의 Order가 없습니다. orderId=" + purchaseProductDTO.getOrderId()));
+			User user = userRepository.findById(purchaseProductDTO.getUserId()).orElseThrow(() ->
+				new IllegalArgumentException("해당 아이디의 User가 없습니다. userId=" + purchaseProductDTO.getUserId()));
 
 			ProductPurchase productPurchase = ProductPurchase.builder()
+				.createDateTime(nowDate)
 				.product(product)
 				.user(user)
-				.quantity(purchaseOrderDTO.getQuantity())
-				.totalPrice(purchaseOrderDTO.getTotalPrice())
+				.quantity(purchaseProductDTO.getQuantity())
+				.totalPrice(purchaseProductDTO.getTotalPrice())
 				.build();
-			productPurchaseRepository.save(productPurchase);
+			productPurchaseList.add(productPurchase);
 
 			ProductHistory productHistory = ProductHistory.builder()
+				.createDateTime(nowDate)
 				.product(product)
 				.user(user)
-				.quantity(purchaseOrderDTO.getQuantity())
-				.totalPrice(purchaseOrderDTO.getTotalPrice())
+				.quantity(purchaseProductDTO.getQuantity())
+				.totalPrice(purchaseProductDTO.getTotalPrice())
 				.build();
-			productHistoryRepository.save(productHistory);
+			productHistoryList.add(productHistory);
 		}
+
+		productPurchaseRepository.saveAll(productPurchaseList);
+		productHistoryRepository.saveAll(productHistoryList);
 	}
 
 	@Getter
 	@NoArgsConstructor
-	public static class PurchaseOrderDTO {
+	public static class PurchaseProductDTO {
 		private long userId;
 		private long orderId;
 		private int quantity;
 		private long totalPrice;
 
 		@Builder
-		public PurchaseOrderDTO(long userId, long orderId,
+		public PurchaseProductDTO(long userId, long orderId,
 			int quantity, long totalPrice) {
 			this.userId = userId;
 			this.orderId = orderId;
